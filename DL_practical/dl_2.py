@@ -76,7 +76,7 @@ def recognize_face(image_path, recognizer, face_cascade, label_encoder):
 image_path = '/content/Sad_Person.jpeg'
 name, confidence = recognize_face(image_path, recognizer, face_cascade, label_encoder)
 print(f"Predicted name: {name}, Confidence: {confidence}")
-
+***********************************below-real-time********************************************
 import cv2
 
 # Initialize face detector
