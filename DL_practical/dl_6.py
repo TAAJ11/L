@@ -53,7 +53,7 @@ plt.ylabel("Loss")
 plt.legend(loc = 'upper right')
 
 plt.show()
-
+******************************************refere-above-for-inbuilf-dataset***************************************
 import pandas as pd    # to load dataset
 import numpy as np     # for mathematic equation
 from nltk.corpus import stopwords   # to get collection of stopwords
