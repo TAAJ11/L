@@ -53,7 +53,7 @@ y_val.iloc[0:3]
 
 loss_df = pd.DataFrame(losses.history)
 loss_df.loc[:,['loss', 'val_loss']].plot()
-
+*****************************************************Diffrent-refere-below-for-inbuild-dataset-************************************
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten
