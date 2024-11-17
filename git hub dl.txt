@@ -1,0 +1,805 @@
+--------Assignment 1 feedforward--------------
+
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Flatten
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load MNIST dataset
+(train_images, train_labels), (test_images, test_labels) = datasets.mnist.load_data()
+
+# Normalize pixel values to between 0 and 1
+train_images = train_images.astype('float32') / 255.0
+test_images = test_images.astype('float32') / 255.0
+
+# Flatten images from 28x28 to 784-dimensional vectors
+train_images = train_images.reshape((train_images.shape[0], 28 * 28))
+test_images = test_images.reshape((test_images.shape[0], 28 * 28))
+
+# Plot the first 5 images and their labels
+plt.figure(figsize=(10,2))
+for i in range(5):
+    plt.subplot(1,5,i+1)
+    plt.imshow(train_images[i].reshape(28,28), cmap='gray')
+    plt.title(f"Label: {train_labels[i]}")
+    plt.axis('off')
+plt.show()
+
+
+# Define the model
+model = models.Sequential([
+    layers.Dense(128, activation='relu', input_shape=(784,)),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(10, activation='softmax')
+])
+
+model.summary()
+
+# compile the model
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+
+# Train the model
+history = model.fit(
+    train_images,
+    train_labels,
+    epochs=10,
+    batch_size=32,
+    validation_split=0.1
+)
+
+test_loss, test_accuracy = model.evaluate(test_images, test_labels)
+print(f"Test Accuracy: {test_accuracy*100:.2f}%")
+
+
+# Plot training & validation accuracy values
+plt.figure(figsize=(12,4))
+
+plt.subplot(1,2,1)
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Val Accuracy')
+plt.title('Model Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+
+# Plot training & validation loss values
+plt.subplot(1,2,2)
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Val Loss')
+plt.title('Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.show()
+
+# Predict the first 5 images in the test set
+predictions = model.predict(test_images[:15])
+
+# Convert predictions to class labels
+predicted_labels = np.argmax(predictions, axis=1)
+
+# Plot the results
+plt.figure(figsize=(10,2))
+for i in range(15):
+  plt.subplot(1,15,i+1)
+  plt.imshow(test_images[i].reshape(28,28), cmap='gray')
+  plt.title(f"Pred: {predicted_labels[i]}\nTrue: {test_labels[i]}")
+  plt.axis('off')
+plt.show()
+
+
+-------------------------Assignment 2 face recognition ---------------
+
+
+# plot photo with detected faces using opencv cascade classifier
+from cv2 import imread
+from cv2 import imshow
+from cv2 import waitKey
+from cv2 import destroyAllWindows
+from cv2 import CascadeClassifier
+from cv2 import rectangle
+# load the photograph
+pixels = imread('faces.jpeg')
+
+# load the pre-trained modelz
+classifier = CascadeClassifier('haarcascade_frontalface_default.xml')
+
+# perform face detection
+bboxes = classifier.detectMultiScale(pixels)
+
+# print bounding box for each detected face
+for box in bboxes:
+	# extract
+	x, y, width, height = box
+	x2, y2 = x + width, y + height
+	# draw a rectangle over the pixels
+	rectangle(pixels, (x, y), (x2, y2), (0,0,255), 1)
+# show the image
+imshow('face detection', pixels)
+# keep the window open until we press a key
+waitKey(0)
+# close the window
+destroyAllWindows()
+
+
+
+
+# plot photo with detected faces using opencv cascade classifier
+from cv2 import imread
+from cv2 import imshow
+from cv2 import waitKey
+from cv2 import destroyAllWindows
+from cv2 import CascadeClassifier
+from cv2 import rectangle
+# load the photograph
+pixels = imread('berkeley_faces.jpg')
+
+# load the pre-trained modelz
+classifier = CascadeClassifier('haarcascade_frontalface_default.xml')
+# perform face detection
+bboxes = classifier.detectMultiScale(pixels)
+# print bounding box for each detected face
+for box in bboxes:
+	# extract
+	x, y, width, height = box
+	x2, y2 = x + width, y + height
+	# draw a rectangle over the pixels
+	rectangle(pixels, (x, y), (x2, y2), (0,0,255), 1)
+# show the image
+imshow('face detection', pixels)
+# keep the window open until we press a key
+waitKey(0)
+# close the window
+destroyAllWindows()
+
+
+
+
+
+# plot photo with detected faces using opencv cascade classifier
+from cv2 import imread
+from cv2 import imshow
+from cv2 import waitKey
+from cv2 import destroyAllWindows
+from cv2 import CascadeClassifier
+from cv2 import rectangle
+# load the photograph
+pixels = imread('pexels-photo-2379005.jpeg')
+
+# load the pre-trained modelz
+classifier = CascadeClassifier('haarcascade_frontalface_default.xml')
+# perform face detection
+bboxes = classifier.detectMultiScale(pixels)
+# print bounding box for each detected face
+for box in bboxes:
+	# extract
+	x, y, width, height = box
+	x2, y2 = x + width, y + height
+	# draw a rectangle over the pixels
+	rectangle(pixels, (x, y), (x2, y2), (0,0,255), 1)
+# show the image
+imshow('face detection', pixels)
+# keep the window open until we press a key
+waitKey(0)
+# close the window
+destroyAllWindows()
+# plot photo with detected faces using opencv cascade classifier
+
+
+
+------------------------------face recognition -----------------------------------------
+
+import cv2
+import os
+import numpy as np
+
+# Load the Haar Cascade for face detection.
+#file contains data required to detect faces in images
+
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+# Load images from the dataset
+def load_images_from_folder(folder):
+    images = []
+    labels = []
+    label_dict = {}
+    current_label = 0
+
+# loops through each person's folder in the dataset
+    for person in os.listdir(folder):
+        person_path = os.path.join(folder, person)
+        if os.path.isdir(person_path):
+            label_dict[current_label] = person
+
+#loops through each image in the person's folder
+            for img_file in os.listdir(person_path):
+                img_path = os.path.join(person_path, img_file)
+                img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE) #cv2.imread=reads the img
+                
+                if img is not None: #Checks if the image is successfully read not
+                    images.append(img)
+                    labels.append(current_label)
+            current_label += 1
+
+    return images, labels, label_dict #returns the lists of images, labels, and the dictionary
+
+# Load images and labels from specific folder(datset)
+images, labels, label_dict = load_images_from_folder('dataset')
+
+# Create the LBPH (local binary patterns histograms) face recognizer using opencv.
+# built-in face_recognition algorithm 
+recognizer = cv2.face.LBPHFaceRecognizer_create()
+
+# Train the recognizer 
+recognizer.train(images, np.array(labels))
+
+# Function to recognize faces
+def recognize_face(recognizer, frame):
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    #Uses the Haar Cascade classifier to detect faces in the grayscale frame
+    faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5)
+
+    for (x, y, w, h) in faces:
+        face = gray_frame[y:y+h, x:x+w]
+        label_id, confidence = recognizer.predict(face)
+    
+
+       
+
+        # Adjust the confidence threshold as needed
+        if confidence < 80:  # confidence score is below 80  it retrieves the name corresponding to the label_id 
+            name = label_dict[label_id]
+            confidence_text = f"{name} ({round(100 - confidence)}%)"
+        else:
+            confidence_text = "Unknown" #confidence is too high then face is labled as "unknown"
+
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        cv2.putText(frame, confidence_text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 2)
+
+    return frame
+
+# Start video capture from webcam
+cap = cv2.VideoCapture(0)
+
+# continuosly reads frames from the webcam 
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Recognize faces in the frame
+    recognized_frame = recognize_face(recognizer, frame)
+
+    # Display the result
+    cv2.imshow('Face Recognition', recognized_frame)
+
+    # Break the loop on 'q' key press
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Stop the webcam and closes all opencv windows
+cap.release()
+cv2.destroyAllWindows()
+
+
+------------------assignment 3 img class------------------------------------------------
+
+
+# 3. Implement Image classification using convolutional neural networks (CNNs) for multiclass
+# classification.
+
+
+
+# Importing the Necessary libraries
+import tensorflow as tf
+# from tensorflow.keras import datasets, layers, models
+import tensorflow.keras
+import matplotlib.pyplot as plt
+from tensorflow.keras.utils import plot_model
+
+
+# loading cifar10 dataset :- 60,000 (32*32) , 10 classes
+(train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
+
+
+# normalizing values to bring between 0 to 1
+train_images, test_images = train_images / 255.0, test_images / 255.0
+
+model = models.Sequential()
+
+
+# 1st Layer -- convolutional layer with 32 filters (3*3)
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)))
+model.add(layers.MaxPooling2D((2, 2)))
+
+
+# 2nd Layer -- convolutional layer with 64 filters (3*3)
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+
+
+
+# Last Layer
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+
+
+#  Flattern and Dense layer (fully connected layers)
+model.add(layers.Flatten())                         
+# converts 2D feature maps into a 1D vector
+model.add(layers.Dense(64, activation='relu'))      
+# fully connected (dense) layer with 64 neurons
+model.add(layers.Dense(10))                         
+# Final layer with 10 neurons for each class in cifar
+
+
+plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=True)
+
+
+
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),     #used for multiclass classification problems 
+              metrics=['accuracy'])
+
+
+
+history = model.fit(train_images, train_labels, epochs=10,
+                    validation_data=(test_images, test_labels))
+
+
+test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=1)
+print(f'Test accuracy: {test_acc:.4f}')
+print(f'Test loss: {test_loss:.4f}')
+
+
+plt.plot(history.history['accuracy'], label='accuracy')
+plt.plot(history.history['val_accuracy'], label='val_accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+# plt.ylim([0.5, 1])
+plt.legend(loc='lower right')
+plt.show()
+
+history.history['accuracy']
+
+
+import numpy as np
+class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+
+# 1. Pick a test image (e.g., the first image in the test set)
+test_image = test_images[1000]
+test_label = test_labels[1000]
+
+# 2. Add a batch dimension (model expects a batch of images)
+test_image_batch = np.expand_dims(test_image, axis=0)
+
+# 3. Make a prediction
+predictions = model.predict(test_image_batch)
+predicted_label = np.argmax(predictions[0])  # Get the index of the highest probability class
+
+# 4. Display the image and the predicted label
+plt.imshow(test_image)
+plt.title(f'Predicted: {class_names[predicted_label]}, Actual: {class_names[test_label[0]]}')
+plt.axis('off')  # Remove axis ticks
+plt.show()
+
+
+------------------------------------assignment 4 stock price rnn--------------------------
+
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+
+
+# Load the stock price data (replace with your dataset)
+data = pd.read_csv('AAPL.csv')  # Example dataset: Apple stock prices
+data['Date'] = pd.to_datetime(data['Date'])
+data.set_index('Date', inplace=True)
+data = data[['Close']]  # Use closing prices for prediction
+
+
+# Data preprocessing
+scaler = MinMaxScaler(feature_range=(0, 1))
+scaled_data = scaler.fit_transform(data)
+
+
+# Create training and testing datasets
+train_size = int(len(scaled_data) * 0.8)
+train_data = scaled_data[:train_size]
+test_data = scaled_data[train_size:]
+
+
+
+
+# Function to create dataset
+def create_dataset(data, time_step=1):
+    X, Y = [], []
+    for i in range(len(data) - time_step):
+        X.append(data[i:(i + time_step), 0])
+        Y.append(data[i + time_step, 0])
+    return np.array(X), np.array(Y)
+
+# Create datasets
+time_step = 1
+X_train, y_train = create_dataset(train_data, time_step)
+X_test, y_test = create_dataset(test_data, time_step)
+
+# Reshape input to be [samples, time steps, features]
+X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
+X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
+
+
+
+# Build the RNN model
+model = Sequential()
+model.add(LSTM(50, return_sequences=False, input_shape=(X_train.shape[1], 1)))  # Single LSTM layer
+model.add(Dense(1))  # Output layer
+
+
+
+# Compile the model
+model.compile(optimizer='adam', loss='mean_squared_error')
+
+# Train the model
+model.fit(X_train, y_train, epochs=10, batch_size=1, verbose=2)  # Reduced epochs for simplicity
+
+# Predicting the stock prices
+train_predict = model.predict(X_train)
+test_predict = model.predict(X_test)
+
+
+
+# Inverse transform to get actual prices
+train_predict = scaler.inverse_transform(train_predict)
+test_predict = scaler.inverse_transform(test_predict)
+
+# Create a new array to hold the predictions
+train_predict_plot = np.empty_like(scaled_data)
+train_predict_plot[:, :] = np.nan
+train_predict_plot[time_step:len(train_predict) + time_step, :] = train_predict
+
+# Create a new array to hold the test predictions
+test_predict_plot = np.empty_like(scaled_data)
+test_predict_plot[:, :] = np.nan
+test_predict_plot[len(train_predict) + (time_step * 2):len(scaled_data), :] = test_predict
+
+# Plotting the results
+plt.figure(figsize=(14, 5))
+plt.plot(data.index, data['Close'], label='Actual Price', color='blue')
+plt.plot(data.index, train_predict_plot, label='Train Predict', color='orange')
+plt.plot(data.index, test_predict_plot, label='Test Predict', color='red')
+plt.title('Stock Price Prediction')
+plt.xlabel('Date')
+plt.ylabel('Stock Price')
+plt.legend()
+plt.show()
+
+-----------------------assignment 5 text identification---------------------------------
+
+
+
+
+Installs the Tesseract OCR engine and the Python wrapper (pytesseract) in the Colab environment.
+
+cv2: OpenCV for image processing (reading, modifying, displaying).
+
+numpy: Supports array operations on images.
+
+pytesseract: Python wrapper for Tesseract OCR, used for text recognition.
+
+cv2_imshow: Displays images in Colab.
+
+files: Allows uploading of files in Colab.
+
+os: Used to manage file paths.
+
+
+
+!apt-get install -y tesseract-ocr  # Install Tesseract OCR engine
+!pip install pytesseract  # Install pytesseract (Python wrapper for Tesseract)
+
+
+import cv2          # For image processing
+import numpy as np   # Used for numerical operations on image arrays
+import pytesseract   # For Optical Character Recognition (OCR)
+from google.colab.patches import cv2_imshow  # To display images in Colab
+from google.colab import files  # To handle file uploads in Colab
+import os           # For file path operations
+
+from google.colab import drive
+drive.mount('/content/drive') # Connect to the Drive
+
+{Defining Helper Functions}
+
+Preprocessing the Image
+
+def preprocess_image(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
+    denoised = cv2.fastNlMeansDenoising(gray)       # Remove noise
+    thresh = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1] 
+ # Binary thresholding
+    return thresh
+
+
+[Detecting Text Regions]
+
+def detect_text_regions(image):
+    # Detecting words
+    boxes = pytesseract.image_to_data(image, output_type=pytesseract.Output.DICT)  
+# Get text region data
+    return boxes
+
+def draw_bounding_boxes(image, boxes):
+    output = image.copy()  # Copy original image to draw boxes
+    n_boxes = len(boxes['level'])  # Total number of detected text regions
+    for i in range(n_boxes):
+        if int(boxes['conf'][i]) > 60:  # Only consider boxes with confidence > 60%
+            (x, y, w, h) = (boxes['left'][i], boxes['top'][i], boxes['width'][i], boxes['height'][i])  # Box coordinates
+            cv2.rectangle(output, (x, y), (x + w, y + h), (0, 255, 0), 2) 
+ # Draw rectangle on the image
+    return output
+
+[Extracting Detected Text]
+Extracts and combines the detected text into a single string.
+
+def get_detected_text(boxes):
+    detected_text = []
+    n_boxes = len(boxes['level'])  # Total number of detected boxes
+    for i in range(n_boxes):
+        if int(boxes['conf'][i]) > 60:  # Only extract text with confidence > 60%
+            detected_text.append(boxes['text'][i])  # Append detected text
+    return ' '.join(detected_text)  # Combine text into a single string
+
+from google.colab import drive
+drive.mount('/content/drive')
+
+
+[Uploading and Reading the Image]
+Prompts the user to upload an image, retrieves the file, and reads it using OpenCV.
+
+
+image_path = "/content/drive/MyDrive/Test_Text/3.png"
+
+image = cv2.imread(image_path)  # Read the image
+
+
+[Processing and Displaying Results]
+Displays the original image, preprocesses it, detects text regions, draws bounding boxes, and prints the extracted text.
+
+
+# Check if image was successfully read
+if image is None:
+    print(f"Error: Unable to read the image file: {image_path}")
+else:
+    # Display original image
+    print("\nOriginal Image:")
+    cv2_imshow(image)
+
+    # Preprocess the image and detect text regions
+    preprocessed = preprocess_image(image)  # Preprocessing
+    boxes = detect_text_regions(preprocessed)  # Detect text regions
+
+    # Draw bounding boxes on original image
+    image_with_boxes = draw_bounding_boxes(image, boxes)
+
+    # Display the image with bounding boxes
+    print("\nImage with Text Detection Regions:")
+    cv2_imshow(image_with_boxes)
+
+    # Extract and print the detected text
+    detected_text = get_detected_text(boxes)
+    print("\nDetected Text:")
+    print(detected_text)
+
+
+-----------------------------assignment 6 sentiment analysis-------------------
+ 
+Sentiment Analysis on IMDB Reviews using LSTM
+Steps
+Load the dataset
+Clean Dataset
+Encode Sentiments
+Split Dataset
+Tokenize and Pad/Truncate Reviews
+Build Architecture/Model
+Train and Test
+
+
+import pandas as pd    # to load dataset
+import numpy as np     # for mathematic equation
+from nltk.corpus import stopwords   # to get collection of stopwords
+from sklearn.model_selection import train_test_split       # for splitting dataset
+from tensorflow.keras.preprocessing.text import Tokenizer  # to encode text to int
+from tensorflow.keras.preprocessing.sequence import pad_sequences   # to do padding or truncating
+from tensorflow.keras.models import Sequential     # the model
+from tensorflow.keras.layers import Embedding, LSTM, Dense # layers of the architecture
+from tensorflow.keras.callbacks import ModelCheckpoint   # save model
+from tensorflow.keras.models import load_model   # load saved model
+import re
+
+data = pd.read_csv('IMDB Dataset.csv')
+
+print(data)
+
+english_stops = set(stopwords.words('english'))
+
+
+def load_dataset():
+    df = pd.read_csv('IMDB Dataset.csv')
+    x_data = df['review']       # Reviews/Input
+    y_data = df['sentiment']    # Sentiment/Output
+
+    # PRE-PROCESS REVIEW
+    x_data = x_data.replace({'<.*?>': ''}, regex = True)          # remove html tag
+    x_data = x_data.replace({'[^A-Za-z]': ' '}, regex = True)     # remove non alphabet
+    x_data = x_data.apply(lambda review: [w for w in review.split() if w not in english_stops])  # remove stop words
+    x_data = x_data.apply(lambda review: [w.lower() for w in review])   # lower case
+
+    # ENCODE SENTIMENT -> 0 & 1
+    y_data = y_data.replace('positive', 1)
+    y_data = y_data.replace('negative', 0)
+
+    return x_data, y_data
+
+x_data, y_data = load_dataset()
+
+print('Reviews')
+print(x_data, '\n')
+print('Sentiment')
+print(y_data)
+
+
+
+x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size = 0.2)
+
+print('Train Set')
+print(x_train, '\n')
+print(x_test, '\n')
+print('Test Set')
+print(y_train, '\n')
+print(y_test)
+
+
+
+
+def get_max_length():
+    review_length = []
+    for review in x_train:
+        review_length.append(len(review))
+
+    return int(np.ceil(np.mean(review_length)))
+
+
+# ENCODE REVIEW
+token = Tokenizer(lower=False)    # no need lower, because already lowered the data in load_data()
+token.fit_on_texts(x_train)
+x_train = token.texts_to_sequences(x_train)
+x_test = token.texts_to_sequences(x_test)
+
+max_length = get_max_length()
+
+x_train = pad_sequences(x_train, maxlen=max_length, padding='post', truncating='post')
+x_test = pad_sequences(x_test, maxlen=max_length, padding='post', truncating='post')
+
+total_words = len(token.word_index) + 1   # add 1 because of 0 padding
+
+print('Encoded X Train\n', x_train, '\n')
+print('Encoded X Test\n', x_test, '\n')
+print('Maximum review length: ', max_length)
+
+
+
+# ARCHITECTURE
+EMBED_DIM = 32
+LSTM_OUT = 64
+
+model = Sequential()
+model.add(Embedding(total_words, EMBED_DIM, input_length = max_length))
+model.add(LSTM(LSTM_OUT))
+model.add(Dense(1, activation='sigmoid'))
+model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+
+print(model.summary())
+
+
+checkpoint = ModelCheckpoint(
+    'models/LSTM.h5',
+    monitor='accuracy',
+    save_best_only=True,
+    verbose=1
+)
+
+model.fit(x_train, y_train, batch_size = 128, epochs = 5, callbacks=[checkpoint])
+
+
+
+
+y_pred = model.predict_classes(x_test, batch_size = 128)
+
+true = 0
+for i, y in enumerate(y_test):
+    if y == y_pred[i]:
+        true += 1
+
+print('Correct Prediction: {}'.format(true))
+print('Wrong Prediction: {}'.format(len(y_pred) - true))
+print('Accuracy: {}'.format(true/len(y_pred)*100))
+
+
+loaded_model = load_model('models/LSTM.h5')
+
+review = str(input('Movie Review: '))
+
+# Pre-process input
+regex = re.compile(r'[^a-zA-Z\s]')
+review = regex.sub('', review)
+print('Cleaned: ', review)
+
+words = review.split(' ')
+filtered = [w for w in words if w not in english_stops]
+filtered = ' '.join(filtered)
+filtered = [filtered.lower()]
+
+print('Filtered: ', filtered)
+
+tokenize_words = token.texts_to_sequences(filtered)
+tokenize_words = pad_sequences(tokenize_words, maxlen=max_length, padding='post', truncating='post')
+print(tokenize_words)
+
+result = loaded_model.predict(tokenize_words)
+print(result)
+
+if result >= 0.7:
+    print('positive')
+else:
+    print('negative')
+
+
+----------------------------assignment 7 obj detection ------------------------------------
+import cv2
+
+img = cv2.imread("D:\Gitesh\BootCamp\Day 4\giraf.jpg")
+cv2.imshow('Image', img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# resizing image
+resized_img = cv2.resize(img, (500,500))
+cv2.imshow("Resized Image", resized_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# converting to gray scale
+gray_img = cv2.cvtColor(resized_img, cv2.COLOR_BGR2GRAY)
+cv2.imshow("Gray image", gray_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# crop image
+cropped_img = resized_img[100:200,100:400]
+cv2.imshow("Cropped image", cropped_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+(h,w) = resized_img.shape[:2]
+center = (w // 2, h // 2)
+M = cv2.getRotationMatrix2D(center, 37, 1, 0)
+rotated_img = cv2.warpAffine(resized_img, M, (w,h))
+cv2.imshow("Rotated image", rotated_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+cv2.rotate(resized_img, cv2.ROTATE_90_CLOCKWISE)
